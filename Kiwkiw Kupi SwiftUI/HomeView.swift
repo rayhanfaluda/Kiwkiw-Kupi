@@ -15,14 +15,17 @@ struct HomeView: View {
     @State var selectedCoffeeRatio = 15
     @State var selectedBalanceSegment = 1
     @State var selectedStrengthSegment = 1
+    @State var selectedRoastSegment = 1
     @State var selectedPourInterval = 45
     @State var totalPours = 5
+    @State var waterTemp = 88
     @State var brewingMode = "Simple"
     @State var isFullScreenPresented = false
     
     let modeSegments = ["Simple", "Advanced"]
     let balanceSegments = ["Sweeter", "Standard", "Brighter"]
     let strengthSegments = ["Light", "Medium", "Strong"]
+    let roastSegments = ["Light Roast", "Medium Roast", "Dark Roast"]
     
     let lightBrown = "#ede0d4"
     let darkBrown = "#b08968"
@@ -158,9 +161,32 @@ struct HomeView: View {
                 .padding(.vertical, 8)
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
-                .padding(.bottom, 32)
                 .onChange(of: selectedStrengthSegment) { _ in
                     totalPours = selectedStrengthSegment == 0 ? 4 : selectedStrengthSegment == 1 ? 5 : selectedStrengthSegment == 2 ? 6 : 5
+                }
+                
+                // MARK: Roast
+                HStack {
+                    Text("Roast")
+                        .fontWeight(.medium)
+                    
+                    Spacer()
+                    
+                    Picker("Select a segment", selection: $selectedRoastSegment) {
+                        ForEach(0..<roastSegments.count, id: \.self) { index in
+                            Text(roastSegments[index])
+                                .tag(index)
+                        }
+                    }
+                    .pickerStyle(.automatic)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+                .padding(.bottom, 32)
+                .onChange(of: selectedRoastSegment) { _ in
+                    waterTemp = selectedRoastSegment == 0 ? 93 : selectedRoastSegment == 1 ? 88 : selectedRoastSegment == 2 ? 83 : 88
                 }
                 
                 // MARK: Summary
@@ -199,22 +225,41 @@ struct HomeView: View {
                     .cornerRadius(8)
                 }
                 
-                VStack {
-                    /*Text("Prepare")
-                        .fontWeight(.medium)*/
+                HStack {
+                    VStack {
+                        /*Text("Prepare")
+                         .fontWeight(.medium)*/
+                        
+                        Text("\(coffeeAmount/selectedCoffeeRatio)g")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        
+                        Text("of ground coffee")
+                            .fontWeight(.medium)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
+                    .cornerRadius(8)
                     
-                    Text("\(coffeeAmount/selectedCoffeeRatio)g")
-                        .font(.title)
-                        .fontWeight(.semibold)
-                    
-                    Text("of ground coffee")
-                        .fontWeight(.medium)
-                        .multilineTextAlignment(.center)
+                    VStack {
+                        /*Text("Prepare")
+                         .fontWeight(.medium)*/
+                        
+                        Text("\(waterTemp)°C")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        
+                        Text("water temp")
+                            .fontWeight(.medium)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
+                    .cornerRadius(8)
                 }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .center)
-                .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
-                .cornerRadius(8)
                 .padding(.bottom, 32)
                 
                 Button {
