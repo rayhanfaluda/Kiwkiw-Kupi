@@ -19,13 +19,10 @@ struct HomeView: View {
     @State var selectedPourInterval = 45
     @State var totalPours = 5
     @State var waterTemp = 88
-    @State var brewingMode = "Simple"
+    @State var brewingMode: ModeSegments = .simple
     @State var isFullScreenPresented = false
     
-    let modeSegments = ["Simple", "Advanced", "Iced"]
-    let balanceSegments = ["Sweeter", "Standard", "Brighter"]
-    let strengthSegments = ["Light", "Medium", "Strong"]
-    let roastSegments = ["Light Roast", "Medium Roast", "Dark Roast"]
+    let modeSegments: [ModeSegments] = [.simple, .advanced, .iced]
     
     let lightBrown = "#ede0d4"
     let darkBrown = "#b08968"
@@ -40,11 +37,20 @@ struct HomeView: View {
                 
                 Picker("Brewing Mode", selection: $brewingMode) {
                     ForEach(modeSegments, id: \.self) { mode in
-                        Text(mode)
+                        Text(mode.rawValue)
                     }
                 }
                 .pickerStyle(.segmented)
                 .padding(.bottom)
+                .onChange(of: brewingMode) { _ in
+                    if brewingMode == .iced {
+                        selectedBalanceSegment = 0
+                        totalPours = 3
+                    } else {
+                        selectedBalanceSegment = 1
+                        totalPours = 5
+                    }
+                }
                 
                 // MARK: Coffee Size
                 HStack {
@@ -54,8 +60,8 @@ struct HomeView: View {
                     Spacer()
                     
                     Picker("Coffee Amount", selection: $coffeeAmount) {
-                        let maxCoffeeAmount = brewingMode == "Simple" ? 500.0 : 610.0
-                        let increment = brewingMode == "Simple" ? 100.0 : 10.0
+                        let maxCoffeeAmount = brewingMode == .simple ? 500.0 : 610.0
+                        let increment = brewingMode == .simple ? 100.0 : 10.0
                         ForEach(Array(stride(from: 200.0, to: maxCoffeeAmount, by: increment)), id: \.self) { size in
                             switch size {
                             case 200.0: Text("\(Int(size)) ml (Small)").tag(size)
@@ -74,126 +80,33 @@ struct HomeView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
                 
-                if brewingMode == "Advanced" {
-                    // MARK: Coffee Ratio
-                    HStack {
-                        Text("Ratio")
-                            .fontWeight(.medium)
-                        
-                        Spacer()
-                        
-                        Picker("Select a segment", selection: $selectedCoffeeRatio) {
-                            ForEach(Array(stride(from: 14.0, to: 17.0, by: 1.0)), id: \.self) { number in
-                                if number == 15.0 {
-                                    Text("1:\(Int(number)) (Default)")
-                                } else {
-                                    Text("1:\(Int(number))")
-                                }
-                            }
-                        }
-                        .pickerStyle(.automatic)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+                switch brewingMode {
+                case .simple:
+                    HomeSimpleView(selectedBalanceSegment: $selectedBalanceSegment,
+                                   selectedStrengthSegment: $selectedStrengthSegment,
+                                   selectedRoastSegment: $selectedRoastSegment,
+                                   totalPours: $totalPours,
+                                   waterTemp: $waterTemp)
+                case .advanced:
+                    HomeSimpleView(selectedBalanceSegment: $selectedBalanceSegment,
+                                   selectedStrengthSegment: $selectedStrengthSegment,
+                                   selectedRoastSegment: $selectedRoastSegment,
+                                   totalPours: $totalPours,
+                                   waterTemp: $waterTemp)
                     
-                    // MARK: Pour Interval
-                    HStack {
-                        Text("Interval")
-                            .fontWeight(.medium)
-                        
-                        Spacer()
-                        
-                        Picker("Select a segment", selection: $selectedPourInterval) {
-                            ForEach(Array(stride(from: 30, to: 50, by: 5)), id: \.self) { number in
-                                if number == 45 {
-                                    Text("\(number)s (Default)")
-                                } else {
-                                    Text("\(number)s")
-                                }
-                            }
-                        }
-                        .pickerStyle(.automatic)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+                    HomeAdvancedView(selectedCoffeeRatio: $selectedCoffeeRatio,
+                                     selectedPourInterval: $selectedPourInterval)
+                case .iced:
+                    EmptyView()
                 }
                 
-                // MARK: Balance
-                HStack {
-                    Text("Balance")
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    Picker("Select a segment", selection: $selectedBalanceSegment) {
-                        ForEach(0..<balanceSegments.count, id: \.self) { index in
-                            Text(balanceSegments[index])
-                                .tag(index)
-                        }
-                    }
-                    .pickerStyle(.automatic)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                
-                // MARK: Strength
-                HStack {
-                    Text("Strength")
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    Picker("Select a segment", selection: $selectedStrengthSegment) {
-                        ForEach(0..<strengthSegments.count, id: \.self) { index in
-                            Text(strengthSegments[index])
-                                .tag(index)
-                        }
-                    }
-                    .pickerStyle(.automatic)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                .onChange(of: selectedStrengthSegment) { _ in
-                    totalPours = selectedStrengthSegment == 0 ? 4 : selectedStrengthSegment == 1 ? 5 : selectedStrengthSegment == 2 ? 6 : 5
-                }
-                
-                // MARK: Roast
-                HStack {
-                    Text("Roast")
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    Picker("Select a segment", selection: $selectedRoastSegment) {
-                        ForEach(0..<roastSegments.count, id: \.self) { index in
-                            Text(roastSegments[index])
-                                .tag(index)
-                        }
-                    }
-                    .pickerStyle(.automatic)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                .padding(.bottom, 32)
-                .onChange(of: selectedRoastSegment) { _ in
-                    waterTemp = selectedRoastSegment == 0 ? 93 : selectedRoastSegment == 1 ? 88 : selectedRoastSegment == 2 ? 83 : 88
-                }
+                Spacer().frame(height: 40)
                 
                 // MARK: Summary
                 HStack(alignment: .center) {
                     VStack {
                         /*Text("Total")
-                            .fontWeight(.medium)*/
+                         .fontWeight(.medium)*/
                         
                         Text("\(totalPours)")
                             .font(.title)
@@ -209,7 +122,7 @@ struct HomeView: View {
                     
                     VStack {
                         /*Text("Estimated")
-                            .fontWeight(.medium)*/
+                         .fontWeight(.medium)*/
                         
                         let totalTime = totalPours * selectedPourInterval
                         Text(formatTime(TimeInterval(totalTime)))
@@ -261,7 +174,28 @@ struct HomeView: View {
                     .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
                     .cornerRadius(8)
                 }
-                .padding(.bottom, 32)
+                
+                if brewingMode == .iced {
+                    VStack {
+                        Text("Prepare")
+                         .fontWeight(.medium)
+                        
+                        let iceAmount = Int((coffeeAmount * 40) / 100)
+                        Text("\(iceAmount)g")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        
+                        Text("of ice")
+                            .fontWeight(.medium)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
+                    .cornerRadius(8)
+                }
+                
+                Spacer().frame(height: 40)
                 
                 Button {
                     isFullScreenPresented = true
@@ -276,9 +210,11 @@ struct HomeView: View {
                 .cornerRadius(8)
                 .fullScreenCover(isPresented: $isFullScreenPresented) {
                     BrewingView(isPresented: $isFullScreenPresented,
+                                brewingMode: $brewingMode,
                                 coffeeAmount: $coffeeAmount,
                                 coffeeBalance: $selectedBalanceSegment,
                                 coffeeStrength: $selectedStrengthSegment,
+                                coffeeRatio: $selectedCoffeeRatio,
                                 pourInterval: $selectedPourInterval)
                 }
             }
@@ -296,4 +232,10 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+}
+
+enum ModeSegments: String, CaseIterable {
+    case simple = "Simple"
+    case advanced = "Advanced"
+    case iced = "Iced"
 }

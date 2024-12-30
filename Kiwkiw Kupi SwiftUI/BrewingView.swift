@@ -10,9 +10,11 @@ import SwiftUI
 struct BrewingView: View {
     
     @Binding var isPresented: Bool
+    @Binding var brewingMode: ModeSegments
     @Binding var coffeeAmount: Double
     @Binding var coffeeBalance: Int
     @Binding var coffeeStrength: Int
+    @Binding var coffeeRatio: Double
     @Binding var pourInterval: Int
     
     @State var circularTitleText = "Get Ready"
@@ -143,42 +145,53 @@ struct BrewingView: View {
     
     // Calculate the steps
     func calculateNumberOfSteps() {
-        switch coffeeStrength {
-        case 0: numberOfSteps = 8
-        case 1: numberOfSteps = 10
-        case 2: numberOfSteps = 12
-        default: break
+        if brewingMode == .iced {
+            numberOfSteps = 6
+        } else {
+            switch coffeeStrength {
+            case 0: numberOfSteps = 8
+            case 1: numberOfSteps = 10
+            case 2: numberOfSteps = 12
+            default: break
+            }
         }
     }
     
     // Calculate the pours
     func calculateAmountOfPour() {
-        let four = (coffeeAmount * 40) / 100
-        let six = (coffeeAmount * 60) / 100
-        
-        switch coffeeBalance {
-        case 0:
-            firstPour = (four * 42) / 100
-            secondPour = (four * 58) / 100
-        case 1:
-            firstPour = (four * 50) / 100
-            secondPour = (four * 50) / 100
-        case 2:
-            firstPour = (four * 58) / 100
-            secondPour = (four * 42) / 100
-        default:
-            break
-        }
-        
-        switch coffeeStrength {
-        case 0:
-            remainingPours = six / 2
-        case 1:
-            remainingPours = six / 3
-        case 2:
-            remainingPours = six / 4
-        default:
-            break
+        if brewingMode == .iced {
+            let groundCoffeeAmount = coffeeAmount / 15
+            firstPour = groundCoffeeAmount * 2.5
+            secondPour = groundCoffeeAmount * 3.5
+            remainingPours = groundCoffeeAmount * 3
+        } else {
+            let groundCoffeeAmount = coffeeAmount / coffeeRatio
+            let six = (coffeeAmount * 60) / 100
+            
+            switch coffeeBalance {
+            case 0:
+                firstPour = groundCoffeeAmount * 2.5
+                secondPour = groundCoffeeAmount * 3.5
+            case 1:
+                firstPour = groundCoffeeAmount * 3
+                secondPour = groundCoffeeAmount * 3
+            case 2:
+                firstPour = groundCoffeeAmount * 3.5
+                secondPour = groundCoffeeAmount * 2.5
+            default:
+                break
+            }
+            
+            switch coffeeStrength {
+            case 0:
+                remainingPours = six / 2
+            case 1:
+                remainingPours = six / 3
+            case 2:
+                remainingPours = six / 4
+            default:
+                break
+            }
         }
     }
     
@@ -297,8 +310,10 @@ struct BrewingView: View {
 
 #Preview {
     BrewingView(isPresented: .constant(true),
+                brewingMode: .constant(.simple),
                 coffeeAmount: .constant(300),
                 coffeeBalance: .constant(0),
                 coffeeStrength: .constant(0),
+                coffeeRatio: .constant(15),
                 pourInterval: .constant(30))
 }
