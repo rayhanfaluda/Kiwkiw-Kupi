@@ -11,8 +11,8 @@ struct HomeView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
-    @State var coffeeAmount = 200
-    @State var selectedCoffeeRatio = 15
+    @State var coffeeAmount: Double = 200
+    @State var selectedCoffeeRatio: Double = 15
     @State var selectedBalanceSegment = 1
     @State var selectedStrengthSegment = 1
     @State var selectedRoastSegment = 1
@@ -22,7 +22,7 @@ struct HomeView: View {
     @State var brewingMode = "Simple"
     @State var isFullScreenPresented = false
     
-    let modeSegments = ["Simple", "Advanced"]
+    let modeSegments = ["Simple", "Advanced", "Iced"]
     let balanceSegments = ["Sweeter", "Standard", "Brighter"]
     let strengthSegments = ["Light", "Medium", "Strong"]
     let roastSegments = ["Light Roast", "Medium Roast", "Dark Roast"]
@@ -54,16 +54,16 @@ struct HomeView: View {
                     Spacer()
                     
                     Picker("Coffee Amount", selection: $coffeeAmount) {
-                        let maxCoffeeAmount = brewingMode == "Simple" ? 500 : 610
-                        let increment = brewingMode == "Simple" ? 100 : 10
-                        ForEach(Array(stride(from: 200, to: maxCoffeeAmount, by: increment)), id: \.self) { size in
+                        let maxCoffeeAmount = brewingMode == "Simple" ? 500.0 : 610.0
+                        let increment = brewingMode == "Simple" ? 100.0 : 10.0
+                        ForEach(Array(stride(from: 200.0, to: maxCoffeeAmount, by: increment)), id: \.self) { size in
                             switch size {
-                            case 200: Text("\(size) ml (Small)").tag(size)
-                            case 300: Text("\(size) ml (Medium)").tag(size)
-                            case 400: Text("\(size) ml (Large)").tag(size)
-                            case 500: Text("\(size) ml (X Large)").tag(size)
-                            case 600: Text("\(size) ml (XX Large)").tag(size)
-                            default: Text("\(size) ml").tag(size)
+                            case 200.0: Text("\(Int(size)) ml (Small)").tag(size)
+                            case 300.0: Text("\(Int(size)) ml (Medium)").tag(size)
+                            case 400.0: Text("\(Int(size)) ml (Large)").tag(size)
+                            case 500.0: Text("\(Int(size)) ml (X Large)").tag(size)
+                            case 600.0: Text("\(Int(size)) ml (XX Large)").tag(size)
+                            default: Text("\(Int(size)) ml").tag(size)
                             }
                         }
                     }
@@ -74,7 +74,7 @@ struct HomeView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
                 
-                if brewingMode != "Simple" {
+                if brewingMode == "Advanced" {
                     // MARK: Coffee Ratio
                     HStack {
                         Text("Ratio")
@@ -83,11 +83,11 @@ struct HomeView: View {
                         Spacer()
                         
                         Picker("Select a segment", selection: $selectedCoffeeRatio) {
-                            ForEach(Array(stride(from: 14, to: 17, by: 1)), id: \.self) { number in
-                                if number == 15 {
-                                    Text("1:\(number) (Default)")
+                            ForEach(Array(stride(from: 14.0, to: 17.0, by: 1.0)), id: \.self) { number in
+                                if number == 15.0 {
+                                    Text("1:\(Int(number)) (Default)")
                                 } else {
-                                    Text("1:\(number)")
+                                    Text("1:\(Int(number))")
                                 }
                             }
                         }
@@ -230,7 +230,8 @@ struct HomeView: View {
                         /*Text("Prepare")
                          .fontWeight(.medium)*/
                         
-                        Text("\(coffeeAmount/selectedCoffeeRatio)g")
+                        let groundCoffeeAmount = Int(coffeeAmount/selectedCoffeeRatio.rounded())
+                        Text("\(groundCoffeeAmount)g")
                             .font(.title)
                             .fontWeight(.semibold)
                         

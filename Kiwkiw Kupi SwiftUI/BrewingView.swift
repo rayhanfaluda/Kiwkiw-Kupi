@@ -10,7 +10,7 @@ import SwiftUI
 struct BrewingView: View {
     
     @Binding var isPresented: Bool
-    @Binding var coffeeAmount: Int
+    @Binding var coffeeAmount: Double
     @Binding var coffeeBalance: Int
     @Binding var coffeeStrength: Int
     @Binding var pourInterval: Int
@@ -26,10 +26,10 @@ struct BrewingView: View {
     @State var timerIsActive: Bool = false
     @State var progressRemainingTime: TimeInterval = 5
     
-    @State var firstPour = 0
-    @State var secondPour = 0
-    @State var remainingPours = 0
-    @State var totalCoffeeAmount = 0
+    @State var firstPour: Double = 0
+    @State var secondPour: Double = 0
+    @State var remainingPours: Double = 0
+    @State var totalCoffeeAmount: Double = 0
     
     @State var isAlertShown = false
     
@@ -78,7 +78,7 @@ struct BrewingView: View {
                                          progress: $progress,
                                          timerIsActive: $timerIsActive)
                 
-                Text("\(totalCoffeeAmount)g total")
+                Text("\(Int(totalCoffeeAmount.rounded()))g total")
                 
                 Spacer()
                 
@@ -158,14 +158,14 @@ struct BrewingView: View {
         
         switch coffeeBalance {
         case 0:
-            firstPour = (four * 40) / 100
-            secondPour = (four * 60) / 100
+            firstPour = (four * 42) / 100
+            secondPour = (four * 58) / 100
         case 1:
             firstPour = (four * 50) / 100
             secondPour = (four * 50) / 100
         case 2:
-            firstPour = (four * 60) / 100
-            secondPour = (four * 40) / 100
+            firstPour = (four * 58) / 100
+            secondPour = (four * 42) / 100
         default:
             break
         }
@@ -187,9 +187,9 @@ struct BrewingView: View {
         if currentStep != numberOfSteps {
             if currentStep % 2 != 0 {
                 switch currentStep {
-                case 1: circularTitleText = "Pour \(firstPour)g"
-                case 3: circularTitleText = "Pour \(secondPour)g"
-                default: circularTitleText = "Pour \(remainingPours)g"
+                case 1: circularTitleText = "Pour \(Int(firstPour.rounded()))g"
+                case 3: circularTitleText = "Pour \(Int(secondPour.rounded()))g"
+                default: circularTitleText = "Pour \(Int(remainingPours.rounded()))g"
                 }
             } else {
                 circularTitleText = "Let it drip"
