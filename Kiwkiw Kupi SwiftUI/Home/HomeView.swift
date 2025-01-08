@@ -23,6 +23,7 @@ struct HomeView: View {
     @State var isFullScreenPresented = false
     
     let modeSegments: [ModeSegments] = [.simple, .advanced, .iced]
+    let roastSegments = ["Light Roast", "Medium Roast", "Dark Roast"]
     
     let lightBrown = "#ede0d4"
     let darkBrown = "#b08968"
@@ -80,17 +81,38 @@ struct HomeView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(8)
                 
+                // MARK: Roast
+                HStack {
+                    Text("Roast")
+                        .fontWeight(.medium)
+                    
+                    Spacer()
+                    
+                    Picker("Select a segment", selection: $selectedRoastSegment) {
+                        ForEach(0..<roastSegments.count, id: \.self) { index in
+                            Text(roastSegments[index])
+                                .tag(index)
+                        }
+                    }
+                    .pickerStyle(.automatic)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+                .onChange(of: selectedRoastSegment) { _ in
+                    waterTemp = selectedRoastSegment == 0 ? 93 : selectedRoastSegment == 1 ? 88 : selectedRoastSegment == 2 ? 83 : 88
+                }
+                
                 switch brewingMode {
                 case .simple:
                     HomeSimpleView(selectedBalanceSegment: $selectedBalanceSegment,
                                    selectedStrengthSegment: $selectedStrengthSegment,
-                                   selectedRoastSegment: $selectedRoastSegment,
                                    totalPours: $totalPours,
                                    waterTemp: $waterTemp)
                 case .advanced:
                     HomeSimpleView(selectedBalanceSegment: $selectedBalanceSegment,
                                    selectedStrengthSegment: $selectedStrengthSegment,
-                                   selectedRoastSegment: $selectedRoastSegment,
                                    totalPours: $totalPours,
                                    waterTemp: $waterTemp)
                     
