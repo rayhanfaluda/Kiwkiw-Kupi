@@ -223,15 +223,16 @@ struct BrewingView: View {
     
     // Update total remaining time
     func updateTotalRemainingTime() {
+        let pouringTime = brewingMode != .iced ? 12 : 10
         if currentStep != numberOfSteps {
             if currentStep % 2 != 0 {
-                remainingTime = 12
-                progressRemainingTime = 12
-                totalRemainingTime = 12
+                remainingTime = TimeInterval(pouringTime)
+                progressRemainingTime = TimeInterval(pouringTime)
+                totalRemainingTime = TimeInterval(pouringTime)
             } else {
-                remainingTime = TimeInterval(pourInterval - 12)
-                progressRemainingTime = TimeInterval(pourInterval - 12)
-                totalRemainingTime = TimeInterval(pourInterval - 12)
+                remainingTime = TimeInterval(pourInterval - pouringTime)
+                progressRemainingTime = TimeInterval(pourInterval - pouringTime)
+                totalRemainingTime = TimeInterval(pourInterval - pouringTime)
             }
         } else {
             remainingTime = 0
