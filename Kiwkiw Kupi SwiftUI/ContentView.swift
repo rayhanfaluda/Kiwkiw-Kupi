@@ -14,6 +14,7 @@ struct ContentView: View {
             NavigationView {
                 HomeView()
             }
+            .navigationViewStyle(.stack)
             .tabItem {
                 Label("Brew", systemImage: "cup.and.heat.waves")
             }
