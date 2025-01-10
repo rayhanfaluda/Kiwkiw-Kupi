@@ -123,6 +123,13 @@ struct BrewingView: View {
         .onAppear {
             calculateNumberOfSteps()
             calculateAmountOfPour()
+            
+            // Makes the screen stays awake
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        .onDisappear {
+            // Makes the screen follows back auto lock settings
+            UIApplication.shared.isIdleTimerDisabled = false
         }
         .onReceive(timer) { _ in
             if timerIsActive {
