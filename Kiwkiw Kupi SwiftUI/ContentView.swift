@@ -8,12 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    
-    @Environment(\.colorScheme) var colorScheme
-    
-    @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
-    @AppStorage("appearance") private var appearance: AppearanceSegments = .system
-    
     var body: some View {
         TabView {
             NavigationView {
@@ -38,15 +32,6 @@ struct ContentView: View {
                 Label("Settings", systemImage: "gearshape")
             }
         }
-        .preferredColorScheme(
-            if appearance == .dark {
-                .dark
-            } else if appearance == .light {
-                .light
-            } else {
-                .none
-            }
-        )
     }
 }
 

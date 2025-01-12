@@ -9,10 +9,8 @@ import SwiftUI
 
 struct SettingsView: View {
     
-    @AppStorage("isDarkMode") private var isDarkMode: Bool = false
-    
-    @State var selectedAppearance: AppearanceSegments = .system
-    
+    // Appearance
+    @EnvironmentObject var themeManager: ThemeManager
     let appearanceSegments: [AppearanceSegments] = [.system, .light, .dark]
     
     var body: some View {
@@ -23,19 +21,12 @@ struct SettingsView: View {
             }
             Section(header: Text("General").textCase(nil)) {
                 Text("Temperature Unit")
-                HStack {
-                    Text("Size")
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    Picker("Appearance", selection: $selectedAppearance) {
-                        ForEach(appearanceSegments, id: \.self) { appearance in
-                            Text(appearance.rawValue)
-                        }
+                Picker("Appearance", selection: $themeManager.appearance) {
+                    ForEach(appearanceSegments, id: \.self) { appearance in
+                        appearance == .system ? Text("\(appearance.rawValue) (Default)") : Text(appearance.rawValue)
                     }
-                    .pickerStyle(.automatic)
                 }
+                .pickerStyle(.automatic)
             }
         }
         .listStyle(InsetGroupedListStyle())
