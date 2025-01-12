@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     
     @Environment(\.colorScheme) var colorScheme
+    @EnvironmentObject var settingsManager: SettingsManager
     
     @State var coffeeAmount: Double = 200
     @State var selectedCoffeeRatio: Double = 15
@@ -21,6 +22,21 @@ struct HomeView: View {
     @State var waterTemp = 88
     @State var brewingMode: ModeSegments = .simple
     @State var isFullScreenPresented = false
+    
+    var displayedTemperature: String {
+        let usesMetric = Locale.current.usesMetricSystem
+        let isSystemMetric = settingsManager.temperatureUnit == .system && usesMetric
+        let isCelsius = settingsManager.temperatureUnit == .celcius || isSystemMetric
+        
+        if isCelsius {
+            return "\(waterTemp)°C"
+        } else {
+            let fahrenheit = Measurement(value: Double(waterTemp), unit: UnitTemperature.celsius)
+                .converted(to: .fahrenheit)
+                .value
+            return String(format: "%.0f°F", fahrenheit)
+        }
+    }
     
     let modeSegments: [ModeSegments] = [.simple, .advanced, .iced]
     
@@ -161,7 +177,7 @@ struct HomeView: View {
                         /*Text("Prepare")
                          .fontWeight(.medium)*/
                         
-                        Text(brewingMode != .iced ? "\(waterTemp)°C" : "91-96°C")
+                        Text(brewingMode != .iced ? displayedTemperature : "91-96°C")
                             .font(.title)
                             .fontWeight(.semibold)
                         

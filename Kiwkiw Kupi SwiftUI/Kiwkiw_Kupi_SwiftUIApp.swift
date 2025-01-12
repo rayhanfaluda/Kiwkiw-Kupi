@@ -7,7 +7,14 @@
 
 import SwiftUI
 
-class ThemeManager: ObservableObject {
+class SettingsManager: ObservableObject {
+    @Published var temperatureUnit: TemperatureUnitSegments {
+        didSet {
+            // Save the raw value to UserDefaults
+            UserDefaults.standard.set(temperatureUnit.rawValue, forKey: "temperatureUnit") // Save state
+        }
+    }
+    
     @Published var appearance: AppearanceSegments {
         didSet {
             // Save the raw value to UserDefaults
@@ -17,8 +24,15 @@ class ThemeManager: ObservableObject {
     
     init() {
         // Load the raw value from UserDefaults and convert it back to the enum
-        if let rawValue = UserDefaults.standard.string(forKey: "appearance"),
-           let savedAppearance = AppearanceSegments(rawValue: rawValue) {
+        if let rawTemperatureUnitValue = UserDefaults.standard.string(forKey: "temperatureUnit"),
+           let savedTemperatureUnit = TemperatureUnitSegments(rawValue: rawTemperatureUnitValue) {
+            self.temperatureUnit = savedTemperatureUnit
+        } else {
+            self.temperatureUnit = .system // Default value
+        }
+        
+        if let rawAppearanceValue = UserDefaults.standard.string(forKey: "appearance"),
+           let savedAppearance = AppearanceSegments(rawValue: rawAppearanceValue) {
             self.appearance = savedAppearance
         } else {
             self.appearance = .system // Default value
@@ -29,14 +43,26 @@ class ThemeManager: ObservableObject {
 @main
 struct Kiwkiw_Kupi_SwiftUIApp: App {
     
-    @StateObject private var themeManager = ThemeManager()
+    @StateObject private var settingsManager = SettingsManager()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(themeManager)
-                .preferredColorScheme(themeManager.appearance == .system ? .none : themeManager.appearance == .light ? .light : themeManager.appearance == .dark ? .dark : .none)
-                .animation(.easeInOut, value: themeManager.appearance)
+                .environmentObject(settingsManager)
+                .preferredColorScheme(settingsManager.appearance == .system ? .none : settingsManager.appearance == .light ? .light : settingsManager.appearance == .dark ? .dark : .none)
+                .animation(.easeInOut, value: settingsManager.appearance)
         }
     }
+}
+
+enum TemperatureUnitSegments: String, CaseIterable {
+    case system = "System"
+    case celcius = "C"
+    case fahrenheit = "F"
+}
+
+enum AppearanceSegments: String, CaseIterable {
+    case system = "System"
+    case light = "Light"
+    case dark = "Dark"
 }

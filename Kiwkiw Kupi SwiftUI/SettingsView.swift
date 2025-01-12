@@ -9,8 +9,10 @@ import SwiftUI
 
 struct SettingsView: View {
     
-    // Appearance
-    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.colorScheme) var colorScheme
+    @EnvironmentObject var settingsManager: SettingsManager
+    
+    let temperatureUnitSegments: [TemperatureUnitSegments] = [.system, .celcius, .fahrenheit]
     let appearanceSegments: [AppearanceSegments] = [.system, .light, .dark]
     
     var body: some View {
@@ -20,10 +22,18 @@ struct SettingsView: View {
                 Text("Restore Purchase")
             }
             Section(header: Text("General").textCase(nil)) {
-                Text("Temperature Unit")
-                Picker("Appearance", selection: $themeManager.appearance) {
+                Picker("Temperature Unit", selection: $settingsManager.temperatureUnit) {
+                    let systemUnit = Locale.current.usesMetricSystem ? "C" : "F"
+                    ForEach(temperatureUnitSegments, id: \.self) { temperatureUnit in
+                        Text(temperatureUnit == .system ? "\(temperatureUnit.rawValue) (°\(systemUnit))" : "°\(temperatureUnit.rawValue)")
+                    }
+                }
+                .pickerStyle(.automatic)
+                
+                Picker("Appearance", selection: $settingsManager.appearance) {
+                    let systemAppearance = colorScheme == .light ? "Light" : "Dark"
                     ForEach(appearanceSegments, id: \.self) { appearance in
-                        appearance == .system ? Text("\(appearance.rawValue) (Default)") : Text(appearance.rawValue)
+                        Text(appearance == .system ? "\(appearance.rawValue) (\(systemAppearance))" : appearance.rawValue)
                     }
                 }
                 .pickerStyle(.automatic)
@@ -35,10 +45,4 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
-}
-
-enum AppearanceSegments: String, CaseIterable {
-    case system = "System"
-    case light = "Light"
-    case dark = "Dark"
 }
