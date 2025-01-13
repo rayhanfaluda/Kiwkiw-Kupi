@@ -18,11 +18,6 @@ struct ContentView: View {
                 Label("Brew", systemImage: "cup.and.heat.waves")
             }
             
-            HistoryView()
-                .tabItem {
-                    Label("History", systemImage: "text.page")
-                }
-            
             NavigationView {
                 SettingsView()
                     .navigationTitle("Settings")

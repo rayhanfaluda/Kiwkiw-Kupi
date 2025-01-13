@@ -23,25 +23,23 @@ struct HomeView: View {
     @State var brewingMode: ModeSegments = .simple
     @State var isFullScreenPresented = false
     
+    let lightBrown = "#ede0d4"
+    let darkBrown = "#b08968"
+    
     var displayedTemperature: String {
         let usesMetric = Locale.current.usesMetricSystem
         let isSystemMetric = settingsManager.temperatureUnit == .system && usesMetric
         let isCelsius = settingsManager.temperatureUnit == .celcius || isSystemMetric
         
         if isCelsius {
-            return "\(waterTemp)°C"
+            return brewingMode != .iced ? "\(waterTemp)°C" : "91-96°C"
         } else {
             let fahrenheit = Measurement(value: Double(waterTemp), unit: UnitTemperature.celsius)
                 .converted(to: .fahrenheit)
                 .value
-            return String(format: "%.0f°F", fahrenheit)
+            return brewingMode != .iced ? String(format: "%.0f°F", fahrenheit) : "195-205°F"
         }
     }
-    
-    let modeSegments: [ModeSegments] = [.simple, .advanced, .iced]
-    
-    let lightBrown = "#ede0d4"
-    let darkBrown = "#b08968"
     
     var body: some View {
         ScrollView {
@@ -52,7 +50,7 @@ struct HomeView: View {
                     .padding(.bottom)
                 
                 Picker("Brewing Mode", selection: $brewingMode) {
-                    ForEach(modeSegments, id: \.self) { mode in
+                    ForEach(ModeSegments.allCases, id: \.self) { mode in
                         Text(mode.rawValue)
                     }
                 }
@@ -125,7 +123,7 @@ struct HomeView: View {
                          .fontWeight(.medium)*/
                         
                         Text("\(totalPours)")
-                            .font(.title)
+                            .font(.title2)
                             .fontWeight(.semibold)
                         
                         Text("pours")
@@ -142,7 +140,7 @@ struct HomeView: View {
                         
                         let totalTime = totalPours * selectedPourInterval
                         Text(formatTime(TimeInterval(totalTime)))
-                            .font(.title)
+                            .font(.title2)
                             .fontWeight(.semibold)
                         
                         Text("total time")
@@ -161,7 +159,7 @@ struct HomeView: View {
                         
                         let groundCoffeeAmount = Int(coffeeAmount/selectedCoffeeRatio.rounded())
                         Text("\(groundCoffeeAmount)g")
-                            .font(.title)
+                            .font(.title2)
                             .fontWeight(.semibold)
                         
                         Text("of ground coffee")
@@ -177,8 +175,8 @@ struct HomeView: View {
                         /*Text("Prepare")
                          .fontWeight(.medium)*/
                         
-                        Text(brewingMode != .iced ? displayedTemperature : "91-96°C")
-                            .font(.title)
+                        Text(displayedTemperature)
+                            .font(.title2)
                             .fontWeight(.semibold)
                         
                         Text("water temp")
@@ -194,11 +192,11 @@ struct HomeView: View {
                 if brewingMode == .iced {
                     VStack {
                         Text("Prepare")
-                         .fontWeight(.medium)
+                            .fontWeight(.medium)
                         
                         let iceAmount = Int((coffeeAmount * 40) / 100)
                         Text("\(iceAmount)g")
-                            .font(.title)
+                            .font(.title2)
                             .fontWeight(.semibold)
                         
                         Text("of ice")

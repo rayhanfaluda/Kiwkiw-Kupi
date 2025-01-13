@@ -8,36 +8,8 @@
 import SwiftUI
 
 class SettingsManager: ObservableObject {
-    @Published var temperatureUnit: TemperatureUnitSegments {
-        didSet {
-            // Save the raw value to UserDefaults
-            UserDefaults.standard.set(temperatureUnit.rawValue, forKey: "temperatureUnit") // Save state
-        }
-    }
-    
-    @Published var appearance: AppearanceSegments {
-        didSet {
-            // Save the raw value to UserDefaults
-            UserDefaults.standard.set(appearance.rawValue, forKey: "appearance") // Save state
-        }
-    }
-    
-    init() {
-        // Load the raw value from UserDefaults and convert it back to the enum
-        if let rawTemperatureUnitValue = UserDefaults.standard.string(forKey: "temperatureUnit"),
-           let savedTemperatureUnit = TemperatureUnitSegments(rawValue: rawTemperatureUnitValue) {
-            self.temperatureUnit = savedTemperatureUnit
-        } else {
-            self.temperatureUnit = .system // Default value
-        }
-        
-        if let rawAppearanceValue = UserDefaults.standard.string(forKey: "appearance"),
-           let savedAppearance = AppearanceSegments(rawValue: rawAppearanceValue) {
-            self.appearance = savedAppearance
-        } else {
-            self.appearance = .system // Default value
-        }
-    }
+    @AppStorage("temperatureUnit") var temperatureUnit: TemperatureUnitSegments = .system
+    @AppStorage("appearance") var appearance: AppearanceSegments = .system
 }
 
 @main
@@ -49,7 +21,7 @@ struct Kiwkiw_Kupi_SwiftUIApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(settingsManager)
-                .preferredColorScheme(settingsManager.appearance == .system ? .none : settingsManager.appearance == .light ? .light : settingsManager.appearance == .dark ? .dark : .none)
+                .preferredColorScheme(settingsManager.appearance.colorScheme)
                 .animation(.easeInOut, value: settingsManager.appearance)
         }
     }
@@ -61,8 +33,19 @@ enum TemperatureUnitSegments: String, CaseIterable {
     case fahrenheit = "F"
 }
 
-enum AppearanceSegments: String, CaseIterable {
-    case system = "System"
-    case light = "Light"
-    case dark = "Dark"
+enum AppearanceSegments: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+    
+    var id: String { self.rawValue }
+    
+    // Map Appearance cases to SwiftUI's ColorScheme
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil // Follow system
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
 }
