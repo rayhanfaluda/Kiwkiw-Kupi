@@ -33,6 +33,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(SettingsManager())
-        .preferredColorScheme(SettingsManager().appearance == .system ? .none : SettingsManager().appearance == .light ? .light : SettingsManager().appearance == .dark ? .dark : .none)
+        .preferredColorScheme(SettingsManager().appearance.colorScheme)
         .animation(.easeInOut, value: SettingsManager().appearance)
 }

@@ -21,14 +21,14 @@ struct SettingsView: View {
             Section(header: Text("General").textCase(nil)) {
                 Picker("Temperature Unit", selection: $settingsManager.temperatureUnit) {
                     let systemUnit = Locale.current.usesMetricSystem ? "C" : "F"
-                    ForEach(TemperatureUnitSegments.allCases, id: \.self) { temperatureUnit in
+                    ForEach(SettingsManager.TemperatureUnitSegments.allCases, id: \.self) { temperatureUnit in
                         Text(temperatureUnit == .system ? "\(temperatureUnit.rawValue) (°\(systemUnit))" : "°\(temperatureUnit.rawValue)")
                     }
                 }
                 .pickerStyle(.automatic)
                 
                 Picker("Appearance", selection: $settingsManager.appearance) {
-                    ForEach(AppearanceSegments.allCases, id: \.self) { appearance in
+                    ForEach(SettingsManager.AppearanceSegments.allCases, id: \.self) { appearance in
                         Text(appearance.rawValue.capitalized)
                     }
                 }
