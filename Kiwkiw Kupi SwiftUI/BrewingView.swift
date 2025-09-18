@@ -86,7 +86,7 @@ struct BrewingView: View {
             isPresented = false
         }) {
             Text("Done")
-                .font(.title)
+                .font(.title2)
                 .fontWeight(.medium)
                 .padding(8)
         }
