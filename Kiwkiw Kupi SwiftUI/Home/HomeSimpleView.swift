@@ -38,7 +38,7 @@ struct HomeSimpleView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(Color(.systemGray6))
-        .cornerRadius(8)
+        .cornerRadius(16)
         
         // MARK: Strength
         HStack {
@@ -58,7 +58,7 @@ struct HomeSimpleView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(Color(.systemGray6))
-        .cornerRadius(8)
+        .cornerRadius(16)
         .onChange(of: selectedStrengthSegment) { _ in
             totalPours = selectedStrengthSegment == 0 ? 4 : selectedStrengthSegment == 1 ? 5 : selectedStrengthSegment == 2 ? 6 : 5
         }
@@ -81,7 +81,7 @@ struct HomeSimpleView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(Color(.systemGray6))
-        .cornerRadius(8)
+        .cornerRadius(16)
         .onChange(of: selectedRoastSegment) { _ in
             waterTemp = selectedRoastSegment == 0 ? 93 : selectedRoastSegment == 1 ? 88 : selectedRoastSegment == 2 ? 83 : 88
         }

@@ -44,11 +44,6 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack {
-                Text("Kiwkiw Kupi")
-                    .font(.largeTitle)
-                    .fontWeight(.semibold)
-                    .padding(.bottom)
-                
                 Picker("Brewing Mode", selection: $brewingMode) {
                     ForEach(ModeSegments.allCases, id: \.self) { mode in
                         Text(mode.rawValue)
@@ -88,11 +83,12 @@ struct HomeView: View {
                         }
                     }
                     .pickerStyle(.automatic)
+                    .frame(minWidth: 120)
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 8)
                 .background(Color(.systemGray6))
-                .cornerRadius(8)
+                .cornerRadius(16)
                 
                 switch brewingMode {
                 case .simple:
@@ -132,7 +128,7 @@ struct HomeView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .center)
                     .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
-                    .cornerRadius(8)
+                    .cornerRadius(16)
                     
                     VStack {
                         /*Text("Estimated")
@@ -149,7 +145,7 @@ struct HomeView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .center)
                     .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
-                    .cornerRadius(8)
+                    .cornerRadius(16)
                 }
                 
                 HStack {
@@ -169,7 +165,7 @@ struct HomeView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .center)
                     .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
-                    .cornerRadius(8)
+                    .cornerRadius(16)
                     
                     VStack {
                         /*Text("Prepare")
@@ -186,7 +182,7 @@ struct HomeView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .center)
                     .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
-                    .cornerRadius(8)
+                    .cornerRadius(16)
                 }
                 
                 if brewingMode == .iced {
@@ -206,7 +202,7 @@ struct HomeView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .center)
                     .background(Color(hex: colorScheme == .light ? lightBrown : darkBrown))
-                    .cornerRadius(8)
+                    .cornerRadius(16)
                 }
                 
                 Spacer().frame(height: 40)
@@ -220,7 +216,7 @@ struct HomeView: View {
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color(.systemBlue))
-                        .cornerRadius(8)
+                        .cornerRadius(16)
                 }
                 .fullScreenCover(isPresented: $isFullScreenPresented) {
                     BrewingView(isPresented: $isFullScreenPresented,

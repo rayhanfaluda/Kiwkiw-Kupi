@@ -396,7 +396,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Kiwkiw Kupi SwiftUI/Preview Content\"";
-				DEVELOPMENT_TEAM = GTU5V8364G;
+				DEVELOPMENT_TEAM = QWVAEMBXMM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kiwkiw Kupi";
@@ -411,7 +411,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "kiwkiw.Kiwkiw-Kupi-SwiftUI-2nd";
+				PRODUCT_BUNDLE_IDENTIFIER = "kiwkiw.Kiwkiw-Kupi-SwiftUI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -427,7 +427,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Kiwkiw Kupi SwiftUI/Preview Content\"";
-				DEVELOPMENT_TEAM = GTU5V8364G;
+				DEVELOPMENT_TEAM = QWVAEMBXMM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kiwkiw Kupi";
@@ -442,7 +442,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "kiwkiw.Kiwkiw-Kupi-SwiftUI-2nd";
+				PRODUCT_BUNDLE_IDENTIFIER = "kiwkiw.Kiwkiw-Kupi-SwiftUI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

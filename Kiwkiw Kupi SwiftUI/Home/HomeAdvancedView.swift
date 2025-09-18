@@ -34,7 +34,7 @@ struct HomeAdvancedView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(Color(.systemGray6))
-        .cornerRadius(8)
+        .cornerRadius(16)
         
         // MARK: Pour Interval
         HStack {
@@ -57,7 +57,7 @@ struct HomeAdvancedView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(Color(.systemGray6))
-        .cornerRadius(8)
+        .cornerRadius(16)
     }
 }
 

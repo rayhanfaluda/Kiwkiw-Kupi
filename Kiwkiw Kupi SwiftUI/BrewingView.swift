@@ -38,27 +38,71 @@ struct BrewingView: View {
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     let progressTimer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
     
+    fileprivate func cancelButton() -> some View {
+        return Button {
+            isAlertShown = true
+        } label: {
+            Image(systemName: "xmark")
+            Text("Cancel")
+        }
+        .opacity(currentStep == numberOfSteps ? 0 : 1)
+        .alert("Cancel the Brew?", isPresented: $isAlertShown) {
+            Button("No", role: .cancel) {
+                isAlertShown = false
+            }
+            
+            Button("Yes", role: .destructive) {
+                isAlertShown = false
+                isPresented = false
+            }
+        }
+    }
+    
+    // Play/Pause Button
+    fileprivate func playPauseButton() -> Button<some View> {
+        return Button(action: {
+            timerIsActive ? pauseTimer() : startTimer()
+        }) {
+            Image(systemName: timerIsActive ? "pause.fill" : "play.fill")
+                .font(.largeTitle)
+                .padding(8)
+        }
+    }
+    
+    // Next Button
+    fileprivate func nextButton() -> Button<some View> {
+        return Button(action: {
+            nextTimer()
+        }) {
+            Image(systemName: "forward.fill")
+                .font(.largeTitle)
+                .padding(8)
+        }
+    }
+    
+    // Done Button
+    fileprivate func doneButton() -> Button<some View> {
+        return Button(action: {
+            isPresented = false
+        }) {
+            Text("Done")
+                .font(.title)
+                .fontWeight(.medium)
+                .padding(8)
+        }
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
             HStack {
-                Button {
-                    isAlertShown = true
-                } label: {
-                    Image(systemName: "xmark")
-                    Text("Cancel")
+                if #available(iOS 26.0, *) {
+                    cancelButton()
+                        .buttonStyle(.glass)
+                        .foregroundStyle(.red)
+                } else {
+                    cancelButton()
+                        .foregroundStyle(.red)
                 }
-                .opacity(currentStep == numberOfSteps ? 0 : 1)
-                .alert("Cancel the Brew?", isPresented: $isAlertShown) {
-                    Button("No", role: .cancel) {
-                        isAlertShown = false
-                    }
-                    
-                    Button("Yes", role: .destructive) {
-                        isAlertShown = false
-                        isPresented = false
-                    }
-                }
-                
                 Spacer()
             }
             .padding()
@@ -86,35 +130,33 @@ struct BrewingView: View {
                 
                 ZStack {
                     if currentStep != numberOfSteps {
-                        // Play/Pause Button
-                        Button(action: {
-                            timerIsActive ? pauseTimer() : startTimer()
-                        }) {
-                            Image(systemName: timerIsActive ? "pause.circle" : "play.circle")
-                                .font(.system(size: 50))
+                        if #available(iOS 26.0, *) {
+                            playPauseButton()
+                                .buttonStyle(.glassProminent)
+                        } else {
+                            playPauseButton()
+                                .buttonStyle(.borderedProminent)
                         }
                         
                         HStack(alignment: .center) {
                             Spacer()
-                            
-                            // Next Button
-                            Button(action: {
-                                nextTimer()
-                            }) {
-                                Image(systemName: "forward.fill")
-                                    .font(.system(size: 50))
+                            if #available(iOS 26.0, *) {
+                                nextButton()
+                                    .buttonStyle(.glassProminent)
+                            } else {
+                                nextButton()
+                                    .buttonStyle(.borderedProminent)
                             }
                         }
                         .opacity(currentStep == 0 ? 0 : 1)
                     } else {
-                        // Done Button
-                        Button(action: {
-                            isPresented = false
-                        }) {
-                            Text("Done")
-                                .font(.title2)
+                        if #available(iOS 26.0, *) {
+                            doneButton()
+                                .buttonStyle(.glassProminent)
+                        } else {
+                            doneButton()
+                                .buttonStyle(.borderedProminent)
                         }
-                        .buttonStyle(.borderedProminent)
                     }
                 }
             }

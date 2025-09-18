@@ -12,6 +12,7 @@ struct ContentView: View {
         TabView {
             NavigationView {
                 HomeView()
+                    .navigationTitle("Kiwkiw Kupi")
             }
             .navigationViewStyle(.stack)
             .tabItem {
