@@ -29,58 +29,67 @@ final class ChatViewModel: ObservableObject {
     private var lastUserMessage: String = ""
     
     // Public: normal send entrypoint
-    func send(_ text: String, onFinish: (() -> Void)? = nil) {
-        // If we're waiting for yes/no/changes, interpret this message as confirmation
-        if isAwaitingConfirmation {
-            handleConfirmation(text)
-            return
-        }
-        // Normal chat reply
-        cancel()
-        isReplyStreaming = true
-        errorText = nil
-        streamingText = ""
-        lastUserMessage = text
-        messages.append(.init(role: .user, text: text))
+    func send(_ text: String) {
+        // If we’re waiting for yes/no/changes, that flow stays the same:
+        if isAwaitingConfirmation { handleConfirmation(text); return }
         
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        
+        cancel()
+        errorText = nil
+        lastUserMessage = trimmed
+        messages.append(.init(role: .user, text: trimmed))
+        
+        // 🔎 Classify the intent first
         activeTask = Task {
             do {
-                let stream = try await assistant.streamChatReply(text)
+                let intent = try await assistant.classifyIntent(trimmed)
+                
+                if intent.intent == .recipe {
+                    // ✅ Command path: do NOT stream chat text with numbers
+                    messages.append(.init(role: .assistant, text: "Got it — building a 4:6 recipe…"))
+                    suggestRecipe()                     // single source of truth
+                    return
+                }
+                
+                // 💬 Chitchat path: stream a normal reply (no numbers, per instructions)
+                isReplyStreaming = true
+                streamingText = ""
+                let stream = try await assistant.streamChatReply(trimmed)
                 for try await snap in stream { streamingText = snap.content.text ?? "" }
                 messages.append(.init(role: .assistant, text: streamingText))
+                isReplyStreaming = false
+                streamingText = ""
             } catch {
                 errorText = error.localizedDescription
+                isReplyStreaming = false
             }
-            isReplyStreaming = false
-            streamingText = ""
-            onFinish?()
         }
     }
     
-    // Build a plan from the latest user message, but DON'T show the card yet
     func suggestRecipe(hint: String? = nil) {
+        if isPlanStreaming { return }
         cancel()
         isPlanStreaming = true
         errorText = nil
         streamingPlan = nil
         finalPlan = nil
-        // We bake the hint in if there is one
+        
         var prompt = """
-        Based on the most recent user request:
-        \"\(lastUserMessage)\"
-        Propose a 4:6 V60 recipe. If they asked for iced/flash brew, set style=iced and use target beverage ml; otherwise style=hot. Keep outputs realistic and within schema.
-        """
-        if let hint, !hint.isEmpty {
-            prompt += "\n\nAdditionally, apply these constraints:\n\(hint)"
-        }
+            Based on the most recent user request:
+            \"\(lastUserMessage)\"
+            Propose a 4:6 V60 recipe. If they asked for iced/flash brew, set style=iced and use target beverage ml; otherwise style=hot. Keep outputs realistic and within schema.
+            """
+        if let hint, !hint.isEmpty { prompt += "\n\nAdditionally, apply these constraints:\n\(hint)" }
         
         activeTask = Task {
             do {
                 let stream = try await assistant.streamBrewPlan(prompt)
                 for try await snapshot in stream { streamingPlan = snapshot.content }
                 finalPlan = streamingPlan?.asComplete()
-                // Ask for approval (only if we actually have a full plan)
                 if let plan = finalPlan {
+                    // Approval bubble derived from the structured plan (no drift)
                     messages.append(.init(role: .assistant, text: approvalPrompt(for: plan)))
                     isAwaitingConfirmation = true
                 }
@@ -88,6 +97,30 @@ final class ChatViewModel: ObservableObject {
                 errorText = error.localizedDescription
             }
             isPlanStreaming = false
+        }
+    }
+    
+    func cancel() { activeTask?.cancel(); activeTask = nil }
+    
+    func clearChat(resetSession: Bool = true) {
+        // stop any generation first
+        cancel()
+        
+        // wipe UI state
+        messages.removeAll()
+        streamingText = ""
+        streamingPlan = nil
+        finalPlan = nil
+        confirmedPlan = nil
+        isReplyStreaming = false
+        isPlanStreaming  = false
+        isAwaitingConfirmation = false
+        errorText = nil
+        lastUserMessage = ""
+        
+        // optionally rebuild the LLM session (forget context)
+        if resetSession {
+            assistant.reset()
         }
     }
     
@@ -159,27 +192,13 @@ final class ChatViewModel: ObservableObject {
         }
     }
     
-    func cancel() { activeTask?.cancel(); activeTask = nil }
-    
-    func clearChat(resetSession: Bool = true) {
-        // stop any generation first
-        cancel()
-        
-        // wipe UI state
-        messages.removeAll()
-        streamingText = ""
-        streamingPlan = nil
-        finalPlan = nil
-        confirmedPlan = nil
-        isReplyStreaming = false
-        isPlanStreaming  = false
-        isAwaitingConfirmation = false
-        errorText = nil
-        lastUserMessage = ""
-        
-        // optionally rebuild the LLM session (forget context)
-        if resetSession {
-            assistant.reset()
-        }
+    private func isRecipeCommand(_ text: String) -> Bool {
+        let t = text.lowercased()
+        // add patterns you like
+        return t.contains("4:6 recipe")
+        || t.contains("suggest recipe")
+        || t.contains("suggest a 4:6")
+        || t.contains("propose 4:6")
+        || t == "suggest 4:6" || t == "suggest 4:6 recipe"
     }
 }

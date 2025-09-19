@@ -110,12 +110,7 @@ struct ChatView: View {
         let msg = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !msg.isEmpty else { return }
         input = ""
-        vm.send(msg) {
-            // Only auto-propose if we're not currently awaiting confirmation (fresh ask)
-            if !vm.isAwaitingConfirmation {
-                vm.suggestRecipe()
-            }
-        }
+        vm.send(msg)
     }
     
     private func scrollToBottom(_ proxy: ScrollViewProxy) {

@@ -31,6 +31,16 @@ public struct Confirmation: Codable, Equatable {
     public var details: String
 }
 
+@Generable
+public enum UserIntent: String, Codable, CaseIterable {
+    case recipe, chitchat
+}
+
+@Generable
+public struct IntentResult: Codable, Equatable {
+    public var intent: UserIntent
+}
+
 // MARK: - Assistant
 
 public final class CoffeeAssistant: @unchecked Sendable {
@@ -115,12 +125,34 @@ public final class CoffeeAssistant: @unchecked Sendable {
         }
         return full
     }
+    
+    public func classifyIntent(_ userText: String) async throws -> IntentResult {
+        let prompt = """
+        Classify the user's message:
+        - recipe: they are asking for a coffee recipe / brewing parameters (dose, ratio, ml, intervals), or say iced/hot V60, or want to start brewing.
+        - chitchat: anything else (general coffee talk, questions without asking for a concrete recipe).
+        
+        User: "\(userText)"
+        """
+        var last: IntentResult.PartiallyGenerated?
+        let stream = session.streamResponse(
+            to: prompt,
+            generating: IntentResult.self,
+            includeSchemaInPrompt: true
+        )
+        for try await snap in stream { last = snap.content }
+        guard let full = last?.intent.map({ IntentResult(intent: $0) }) else {
+            throw CoffeeAssistantError.incompleteIntent
+        }
+        return full
+    }
 }
 
 // MARK: - Errors
 
 public enum CoffeeAssistantError: Error {
     case incompleteConfirmation
+    case incompleteIntent
 }
 
 // MARK: - Base system instructions
@@ -149,6 +181,8 @@ private extension CoffeeAssistant {
     - Be concise and friendly.
     - Never invent impossible numbers; ensure internal consistency across fields.
     - Prefer metric units and °C when discussing temperatures.
+    - In free-form chat text, **do not print a full numeric recipe**.
+    - When a recipe is requested, **emit only the BrewPlan** and let the app render numbers.
     """
 }
 
