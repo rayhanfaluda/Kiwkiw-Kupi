@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2C13D56E2E7C6A5300B44697 /* FoundationModels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C13D56D2E7C6A5300B44697 /* FoundationModels.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2C9CD90C2CED9B7D006F378E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2C13D56D2E7C6A5300B44697 /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		2C9CD8FB2CED9B7B006F378E /* Kiwkiw Kupi SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Kiwkiw Kupi SwiftUI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C9CD90B2CED9B7D006F378E /* Kiwkiw Kupi SwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Kiwkiw Kupi SwiftUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C9CD9152CED9B7D006F378E /* Kiwkiw Kupi SwiftUIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Kiwkiw Kupi SwiftUIUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C13D56E2E7C6A5300B44697 /* FoundationModels.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,12 +78,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2C13D56C2E7C6A5300B44697 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2C13D56D2E7C6A5300B44697 /* FoundationModels.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		2C9CD8F22CED9B7B006F378E = {
 			isa = PBXGroup;
 			children = (
 				2C9CD8FD2CED9B7B006F378E /* Kiwkiw Kupi SwiftUI */,
 				2C9CD90E2CED9B7D006F378E /* Kiwkiw Kupi SwiftUITests */,
 				2C9CD9182CED9B7D006F378E /* Kiwkiw Kupi SwiftUIUITests */,
+				2C13D56C2E7C6A5300B44697 /* Frameworks */,
 				2C9CD8FC2CED9B7B006F378E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -399,13 +414,14 @@
 				DEVELOPMENT_TEAM = QWVAEMBXMM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Kiwkiw-Kupi-SwiftUI-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Kiwkiw Kupi";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -430,13 +446,14 @@
 				DEVELOPMENT_TEAM = QWVAEMBXMM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Kiwkiw-Kupi-SwiftUI-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Kiwkiw Kupi";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

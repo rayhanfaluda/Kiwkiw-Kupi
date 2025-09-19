@@ -183,13 +183,13 @@ struct BrewingView: View {
                 updateProgressTimer()
             }
         }
-        .onChange(of: currentStep) { _ in
+        .onChange(of: currentStep, { _, _ in
             updateCircularTitleText()
             updateTotalRemainingTime()
             if currentStep % 2 != 0 {
                 updateTotalCoffeeAmount()
             }
-        }
+        })
     }
     
     // Calculate the steps

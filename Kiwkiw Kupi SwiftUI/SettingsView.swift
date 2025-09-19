@@ -20,7 +20,7 @@ struct SettingsView: View {
             }
             Section(header: Text("General").textCase(nil)) {
                 Picker("Temperature Unit", selection: $settingsManager.temperatureUnit) {
-                    let systemUnit = Locale.current.usesMetricSystem ? "C" : "F"
+                    let systemUnit = Locale.current.measurementSystem == .metric ? "C" : "F"
                     ForEach(SettingsManager.TemperatureUnitSegments.allCases, id: \.self) { temperatureUnit in
                         Text(temperatureUnit == .system ? "\(temperatureUnit.rawValue) (°\(systemUnit))" : "°\(temperatureUnit.rawValue)")
                     }

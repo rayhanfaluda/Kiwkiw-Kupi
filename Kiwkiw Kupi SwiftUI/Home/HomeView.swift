@@ -27,8 +27,8 @@ struct HomeView: View {
     let darkBrown = "#b08968"
     
     var displayedTemperature: String {
-        let usesMetric = Locale.current.usesMetricSystem
-        let isSystemMetric = settingsManager.temperatureUnit == .system && usesMetric
+        let measurementSystem = Locale.current.measurementSystem
+        let isSystemMetric = settingsManager.temperatureUnit == .system && measurementSystem == .metric
         let isCelsius = settingsManager.temperatureUnit == .celcius || isSystemMetric
         
         if isCelsius {
@@ -51,7 +51,7 @@ struct HomeView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.bottom)
-                .onChange(of: brewingMode) { _ in
+                .onChange(of: brewingMode, { _, _ in
                     if brewingMode == .iced {
                         selectedBalanceSegment = 0
                         totalPours = 3
@@ -59,7 +59,7 @@ struct HomeView: View {
                         selectedBalanceSegment = 1
                         totalPours = 5
                     }
-                }
+                })
                 
                 // MARK: Coffee Size
                 HStack {
@@ -244,7 +244,7 @@ struct HomeView: View {
     HomeView()
 }
 
-enum ModeSegments: String, CaseIterable {
+enum ModeSegments: String, CaseIterable, Codable {
     case simple = "Simple"
     case advanced = "Advanced"
     case iced = "Iced"
