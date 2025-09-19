@@ -31,18 +31,17 @@ struct BrewPlanCard: View {
     private func summary(_ p: BrewPlan) -> Text {
         switch p.style {
         case .iced:
-            let dose = Text("\(p.coffeeGrams, specifier: "%.1f")") + Text(" g")
+            let dose = Text("\(p.coffeeGrams, specifier: "%.1f")") + Text("g")
             let target = Int(p.primaryVolume.rounded())
             return dose
-            + Text(" · target ") + Text("\(target)") + Text(" ml")
-            + Text(" · target ") + Text("\(target)") + Text(" ml")
+            + Text(" · target ") + Text("\(target)") + Text("ml")
             + Text(" · 1:") + Text("\(p.ratio, specifier: "%.1f")")
             + Text(" · interval ") + Text("\(p.pourIntervalSec)") + Text("s")
         case .hot:
-            let dose = Text("\(p.coffeeGrams, specifier: "%.1f")") + Text(" g")
+            let dose = Text("\(p.coffeeGrams, specifier: "%.1f")") + Text("g")
             let total = Int(p.primaryVolume.rounded())
             return dose
-            + Text(" · total ") + Text("\(total)") + Text(" g")
+            + Text(" · total ") + Text("\(total)") + Text("ml")
             + Text(" · 1:") + Text("\(p.ratio, specifier: "%.1f")")
             + Text(" · interval ") + Text("\(p.pourIntervalSec)") + Text("s")
         }

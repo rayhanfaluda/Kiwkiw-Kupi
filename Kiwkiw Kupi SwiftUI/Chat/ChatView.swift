@@ -12,6 +12,7 @@ struct ChatView: View {
     @StateObject private var vm = ChatViewModel()
     @Environment(\.openURL) private var openURL
     @State private var input = ""
+    @State private var showClearConfirm = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -83,19 +84,25 @@ struct ChatView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    clearChats()
-                }) {
-                    Text("Clear")
+                Button(role: .destructive) {
+                    showClearConfirm = true
+                } label: {
+                    Image(systemName: "trash")
                 }
+                .tint(.red)
             }
         }
-    }
-    
-    private func clearChats() {
-        vm.cancel()
-        vm.messages.removeAll()
-        input = ""
+        .alert("Clear all messages?", isPresented: $showClearConfirm) {
+            Button("No", role: .cancel) {
+                showClearConfirm = false
+            }
+            
+            Button("Yes", role: .destructive) {
+                vm.clearChat(resetSession: true)
+                input = ""
+                showClearConfirm = false
+            }
+        }
     }
     
     // Clear and chain suggest AFTER the reply finishes

@@ -125,7 +125,7 @@ final class ChatViewModel: ObservableObject {
                     messages.append(.init(role: .assistant, text: "No problem—recipe canceled. Tell me when you want to try again."))
                     
                 case .unclear:
-                    messages.append(.init(role: .assistant, text: "I didn’t catch that—say **Yes** to accept, or tell me what to change (e.g., “stronger”, “ratio 1:16”, “iced 300 ml”)."))
+                    messages.append(.init(role: .assistant, text: "I didn’t catch that—say **Yes** to accept, or tell me what to change (e.g., “stronger”, “ratio 1:16”, “iced 300ml”)."))
                 }
             } catch {
                 errorText = error.localizedDescription
@@ -152,12 +152,34 @@ final class ChatViewModel: ObservableObject {
         switch plan.style {
         case .iced:
             let target = Int(plan.primaryVolume.rounded())
-            return "Here’s my 4:6 (Japanese iced) suggestion: **\(dose) g**, target **\(target) ml**, ratio **1:\(ratio)**, interval **\(interval)s**. Does this look good? Say **Yes** to confirm or tell me what to change."
+            return "Here’s my 4:6 (Japanese iced) suggestion: **\(dose)g**, target **\(target)ml**, ratio **1:\(ratio)**, interval **\(interval)s**. Does this look good? Say **Yes** to confirm or tell me what to change."
         case .hot:
             let total = Int(plan.primaryVolume.rounded())
-            return "Here’s my 4:6 suggestion: **\(dose) g**, total **\(total) g**, ratio **1:\(ratio)**, interval **\(interval)s**. Happy with this? Say **Yes** to confirm or tell me what to tweak."
+            return "Here’s my 4:6 suggestion: **\(dose)g**, total **\(total)ml**, ratio **1:\(ratio)**, interval **\(interval)s**. Happy with this? Say **Yes** to confirm or tell me what to tweak."
         }
     }
     
     func cancel() { activeTask?.cancel(); activeTask = nil }
+    
+    func clearChat(resetSession: Bool = true) {
+        // stop any generation first
+        cancel()
+        
+        // wipe UI state
+        messages.removeAll()
+        streamingText = ""
+        streamingPlan = nil
+        finalPlan = nil
+        confirmedPlan = nil
+        isReplyStreaming = false
+        isPlanStreaming  = false
+        isAwaitingConfirmation = false
+        errorText = nil
+        lastUserMessage = ""
+        
+        // optionally rebuild the LLM session (forget context)
+        if resetSession {
+            assistant.reset()
+        }
+    }
 }
