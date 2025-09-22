@@ -30,8 +30,17 @@ final class ChatViewModel: ObservableObject {
     
     // Public: normal send entrypoint
     func send(_ text: String) {
+        // Hide any previously confirmed card as soon as the user starts a new turn
+        hidePlanCard()
+        
         // If we’re waiting for yes/no/changes, that flow stays the same:
-        if isAwaitingConfirmation { handleConfirmation(text); return }
+        if isAwaitingConfirmation {
+            handleConfirmation(text)
+            return
+        }
+        
+        // New turn → make sure we’re not stuck in confirmation mode from before
+        isAwaitingConfirmation = false
         
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -41,53 +50,65 @@ final class ChatViewModel: ObservableObject {
         lastUserMessage = trimmed
         messages.append(.init(role: .user, text: trimmed))
         
-        // 🔎 Classify the intent first
+        // Classify the intent first
         activeTask = Task {
             do {
                 let intent = try await assistant.classifyIntent(trimmed)
                 
                 if intent.intent == .recipe {
-                    // ✅ Command path: do NOT stream chat text with numbers
+                    // Command path: do NOT stream chat text with numbers
                     messages.append(.init(role: .assistant, text: "Got it — building a 4:6 recipe…"))
-                    suggestRecipe()                     // single source of truth
+                    suggestRecipe()
                     return
                 }
                 
-                // 💬 Chitchat path: stream a normal reply (no numbers, per instructions)
+                // Chitchat path: stream a normal reply (no numbers, per instructions)
                 isReplyStreaming = true
+                defer { isReplyStreaming = false }    // always reset even if an error happens
                 streamingText = ""
+                
                 let stream = try await assistant.streamChatReply(trimmed)
-                for try await snap in stream { streamingText = snap.content.text ?? "" }
+                for try await snap in stream {
+                    // ChatReply is streamed as PartiallyGenerated → .text is optional while streaming
+                    streamingText = snap.content.text ?? ""
+                }
                 messages.append(.init(role: .assistant, text: streamingText))
-                isReplyStreaming = false
                 streamingText = ""
             } catch {
-                errorText = error.localizedDescription
                 isReplyStreaming = false
+                streamingText = ""
+                errorText = error.localizedDescription
             }
         }
     }
     
     func suggestRecipe(hint: String? = nil) {
+        // Prevent duplicate, overlapping generations
         if isPlanStreaming { return }
+        
         cancel()
+        hidePlanCard()
         isPlanStreaming = true
         errorText = nil
         streamingPlan = nil
         finalPlan = nil
+        isAwaitingConfirmation = false
         
         var prompt = """
-            Based on the most recent user request:
-            \"\(lastUserMessage)\"
-            Propose a 4:6 V60 recipe. If they asked for iced/flash brew, set style=iced and use target beverage ml; otherwise style=hot. Keep outputs realistic and within schema.
-            """
+        Based on the most recent user request:
+        \"\(lastUserMessage)\"
+        Propose a 4:6 V60 recipe. If they asked for iced/flash brew, set style=iced and use target beverage ml; otherwise style=hot. Keep outputs realistic and within schema.
+        """
         if let hint, !hint.isEmpty { prompt += "\n\nAdditionally, apply these constraints:\n\(hint)" }
         
         activeTask = Task {
             do {
                 let stream = try await assistant.streamBrewPlan(prompt)
-                for try await snapshot in stream { streamingPlan = snapshot.content }
+                for try await snapshot in stream {
+                    streamingPlan = snapshot.content
+                }
                 finalPlan = streamingPlan?.asComplete()
+                
                 if let plan = finalPlan {
                     // Approval bubble derived from the structured plan (no drift)
                     messages.append(.init(role: .assistant, text: approvalPrompt(for: plan)))
@@ -200,5 +221,9 @@ final class ChatViewModel: ObservableObject {
         || t.contains("suggest a 4:6")
         || t.contains("propose 4:6")
         || t == "suggest 4:6" || t == "suggest 4:6 recipe"
+    }
+    
+    private func hidePlanCard() {
+        confirmedPlan = nil
     }
 }

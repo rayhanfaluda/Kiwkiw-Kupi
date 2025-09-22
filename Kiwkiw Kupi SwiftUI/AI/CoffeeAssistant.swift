@@ -148,19 +148,16 @@ public final class CoffeeAssistant: @unchecked Sendable {
     }
 }
 
-// MARK: - Errors
-
-public enum CoffeeAssistantError: Error {
-    case incompleteConfirmation
-    case incompleteIntent
-}
-
 // MARK: - Base system instructions
-
 private extension CoffeeAssistant {
     /// Keep these instructions tight so the on-device model excels at the 4:6 domain + structured output.
     static let baseInstructions: String = """
     You are a coffee assistant specialized in the Tetsu Kasuya 4:6 pour-over method (V60).
+    
+    Scope and safety:
+    - Only talk about coffee, brewing, recipes, or flavor notes.
+    - Never discuss medical, legal, safety-critical, or unrelated topics.
+    - Treat words like "hot" and "iced" strictly as beverage temperature styles.
     
     Your jobs:
     1) Chat clearly about coffee and brewing.
@@ -187,10 +184,15 @@ private extension CoffeeAssistant {
 }
 
 // MARK: - PartiallyGenerated → Complete helpers
-
 private extension Confirmation.PartiallyGenerated {
     func asComplete() -> Confirmation? {
         guard let action else { return nil }
         return Confirmation(action: action, details: details ?? "")
     }
+}
+
+// MARK: - Errors
+public enum CoffeeAssistantError: Error {
+    case incompleteConfirmation
+    case incompleteIntent
 }
