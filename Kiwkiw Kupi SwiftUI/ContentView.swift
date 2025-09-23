@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    enum Tab: Hashable { case brew, ai, settings }
+    enum Tab: Hashable { case brew, chat, settings }
     
     @State private var selectedTab: Tab = .brew
     @State private var brewParams: BrewingParams?   // when set → present BrewingView sheet
@@ -31,7 +31,7 @@ struct ContentView: View {
                 }
                 .navigationViewStyle(.stack)
                 .tabItem { Label("Chat", systemImage: "wand.and.sparkles") }
-                .tag(Tab.ai)
+                .tag(Tab.chat)
             }
             
             NavigationView {
@@ -64,19 +64,21 @@ struct BrewingSessionSheet: View {
     @State private var isPresented: Bool = true
     @State private var brewingMode: ModeSegments
     @State private var coffeeAmount: Double
-    @State private var coffeeBalance: Int
-    @State private var coffeeStrength: Int
+    @State private var coffeeBalance: BrewBalance
+    @State private var coffeeStrength: BrewStrength
+    @State private var coffeeRoast: BrewRoast
     @State private var coffeeRatio: Double
     @State private var pourInterval: Int
     
     init(params: BrewingParams) {
         self.params = params
-        _brewingMode   = State(initialValue: params.brewingMode)
-        _coffeeAmount  = State(initialValue: params.coffeeAmount)
-        _coffeeBalance = State(initialValue: params.coffeeBalance)
+        _brewingMode    = State(initialValue: params.brewingMode)
+        _coffeeAmount   = State(initialValue: params.coffeeAmount)
+        _coffeeBalance  = State(initialValue: params.coffeeBalance)
         _coffeeStrength = State(initialValue: params.coffeeStrength)
-        _coffeeRatio   = State(initialValue: params.coffeeRatio)
-        _pourInterval  = State(initialValue: params.pourInterval)
+        _coffeeRoast    = State(initialValue: params.coffeeRoast)
+        _coffeeRatio    = State(initialValue: params.coffeeRatio)
+        _pourInterval   = State(initialValue: params.pourInterval)
     }
     
     var body: some View {
@@ -104,8 +106,12 @@ enum DeepLinkParser {
             let modeRaw = val("mode"),
             let mode = ModeSegments(rawValue: modeRaw),
             let coffeeAmount = Double(val("coffeeAmount") ?? ""),
-            let balance = Int(val("balance") ?? ""),
-            let strength = Int(val("strength") ?? ""),
+            let balanceRaw = val("balance"),
+            let balance = BrewBalance(rawValue: balanceRaw),
+            let strengthRaw = val("strength"),
+            let strength = BrewStrength(rawValue: strengthRaw),
+            let roastRaw = val("roast"),
+            let roast = BrewRoast(rawValue: roastRaw),
             let ratio = Double(val("ratio") ?? ""),
             let pourInterval = Int(val("pourInterval") ?? "")
         else { return nil }
@@ -115,6 +121,7 @@ enum DeepLinkParser {
             coffeeAmount: coffeeAmount,
             coffeeBalance: balance,
             coffeeStrength: strength,
+            coffeeRoast: roast,
             coffeeRatio: ratio,
             pourInterval: pourInterval
         )

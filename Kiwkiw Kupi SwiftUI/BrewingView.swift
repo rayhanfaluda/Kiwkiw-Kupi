@@ -12,8 +12,8 @@ struct BrewingView: View {
     @Binding var isPresented: Bool
     @Binding var brewingMode: ModeSegments
     @Binding var coffeeAmount: Double
-    @Binding var coffeeBalance: Int
-    @Binding var coffeeStrength: Int
+    @Binding var coffeeBalance: BrewBalance
+    @Binding var coffeeStrength: BrewStrength
     @Binding var coffeeRatio: Double
     @Binding var pourInterval: Int
     
@@ -198,9 +198,9 @@ struct BrewingView: View {
             numberOfSteps = 6
         } else {
             switch coffeeStrength {
-            case 0: numberOfSteps = 8
-            case 1: numberOfSteps = 10
-            case 2: numberOfSteps = 12
+            case .light: numberOfSteps = 8
+            case .medium: numberOfSteps = 10
+            case .strong: numberOfSteps = 12
             default: break
             }
         }
@@ -218,13 +218,13 @@ struct BrewingView: View {
             let six = (coffeeAmount * 60) / 100
             
             switch coffeeBalance {
-            case 0:
+            case .sweeter:
                 firstPour = groundCoffeeAmount * 2.5
                 secondPour = groundCoffeeAmount * 3.5
-            case 1:
+            case .standard:
                 firstPour = groundCoffeeAmount * 3
                 secondPour = groundCoffeeAmount * 3
-            case 2:
+            case .brighter:
                 firstPour = groundCoffeeAmount * 3.5
                 secondPour = groundCoffeeAmount * 2.5
             default:
@@ -232,11 +232,11 @@ struct BrewingView: View {
             }
             
             switch coffeeStrength {
-            case 0:
+            case .light:
                 remainingPours = six / 2
-            case 1:
+            case .medium:
                 remainingPours = six / 3
-            case 2:
+            case .strong:
                 remainingPours = six / 4
             default:
                 break
@@ -362,8 +362,8 @@ struct BrewingView: View {
     BrewingView(isPresented: .constant(true),
                 brewingMode: .constant(.simple),
                 coffeeAmount: .constant(300),
-                coffeeBalance: .constant(0),
-                coffeeStrength: .constant(0),
+                coffeeBalance: .constant(.standard),
+                coffeeStrength: .constant(.medium),
                 coffeeRatio: .constant(15),
                 pourInterval: .constant(30))
 }

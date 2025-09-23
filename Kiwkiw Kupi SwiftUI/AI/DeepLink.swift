@@ -11,8 +11,9 @@ struct BrewingParams: Equatable, Codable, Identifiable {
     var id = UUID()
     var brewingMode: ModeSegments
     var coffeeAmount: Double
-    var coffeeBalance: Int
-    var coffeeStrength: Int
+    var coffeeBalance: BrewBalance
+    var coffeeStrength: BrewStrength
+    var coffeeRoast: BrewRoast
     var coffeeRatio: Double
     var pourInterval: Int
 }
@@ -20,9 +21,6 @@ struct BrewingParams: Equatable, Codable, Identifiable {
 extension BrewingParams {
     @available(iOS 26.0, *)
     init(plan: BrewPlan) {
-        let bal = max(0, min(2, plan.balanceLevel))
-        let str = max(0, min(2, plan.strengthLevel))
-
         if plan.style == .iced {
             // BrewingView expects: .iced + coffeeAmount = target ml
             self.brewingMode  = .iced
@@ -32,10 +30,11 @@ extension BrewingParams {
             self.brewingMode  = .simple
             self.coffeeAmount = plan.primaryVolume // total water grams
         }
-        self.coffeeBalance = bal
-        self.coffeeStrength = str
-        self.coffeeRatio   = plan.ratio
-        self.pourInterval  = plan.pourIntervalSec
+        self.coffeeBalance  = plan.balanceLevel
+        self.coffeeStrength = plan.strengthLevel
+        self.coffeeRoast    = plan.roastLevel
+        self.coffeeRatio    = plan.ratio
+        self.pourInterval   = plan.pourIntervalSec
     }
 }
 
@@ -47,8 +46,9 @@ extension URL {
         comps.queryItems = [
             .init(name: "mode", value: p.brewingMode.rawValue),
             .init(name: "coffeeAmount", value: String(p.coffeeAmount)),
-            .init(name: "balance", value: String(p.coffeeBalance)),
-            .init(name: "strength", value: String(p.coffeeStrength)),
+            .init(name: "balance", value: p.coffeeBalance.rawValue),
+            .init(name: "strength", value: p.coffeeStrength.rawValue),
+            .init(name: "roast", value: p.coffeeRoast.rawValue),
             .init(name: "ratio", value: String(p.coffeeRatio)),
             .init(name: "pourInterval", value: String(p.pourInterval)),
         ]

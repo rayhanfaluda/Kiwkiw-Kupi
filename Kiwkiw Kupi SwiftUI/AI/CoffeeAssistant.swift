@@ -166,12 +166,17 @@ private extension CoffeeAssistant {
     
     BrewPlan constraints:
     - style: "hot" by default unless the user explicitly requests iced/flash brew (then "iced").
-    - HOT: Primary Volume = coffeeGrams * ratio (total brew water in mililters).
-    - ICED (Japanese iced / flash brew): Primary Volume = target beverage milliliters.
-    - Balance Level ∈ {0,1,2}  (0 = sweeter/less bright, 1 = balanced, 2 = brighter).
-    - Strength Level ∈ {0,1,2} (0 = light, 1 = medium, 2 = strong).
-    - Ratio in 13.0…18.0 (default ~15.0). Keep values realistic for V60.
-    - Pour Intervals in 15…45 (typical 20–35). Keep steady unless the user asks otherwise.
+    - HOT: primaryVolume = coffeeGrams * ratio (total brew water in grams).
+    - ICED (Japanese iced / flash brew): primaryVolume = coffeeGrams * ratio (target beverage in milliliters). Do NOT output only the hot-water portion.
+    - Balance Level ∈ {sweeter, standard/balanced, brighter}.
+    - Strength Level ∈ {light, medium, strong}. Affects the number of pours needed. Light = 4 pours, Medium = 5 pours, Strong = 6 pours.
+    - Roast Level ∈ {lightRoast, mediumRoast, darkRoast}. Affects the water temperature needed. Light Roast = 93°C, Medium Roast = 88°C, Dark Roast = 83°C.
+    - Water Temperature. If style == HOT, depends on Roast Level. Light Roast = 93°C, Medium Roast = 88°C, Dark Roast = 83°C. If style == ICED, suggest between 91-96°C.
+    - Ratio in 13.0...18.0 (default ~15.0). Keep values realistic for V60.
+    - Total Pours in 3...6 (default 5). If style == HOT, affected by Strength Level. Light = 4, Medium = 5, Strong = 6. If style == ICED, Total Pours = 3.
+    - Pour Intervals in 15...45 (typical 25–45). Keep steady unless the user asks otherwise. If style == ICED, suggest 30.
+    - Total Time = totalPours * pourIntervalSec.
+    - Ice Amount = primaryVolume * 40%. Suggest ice amount if style == ICED. Otherwise, do not suggest.
     - Populate `notes` with a short, helpful tip for the chosen parameters.
     
     Output guidelines:

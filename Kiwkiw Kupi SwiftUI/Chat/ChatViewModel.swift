@@ -107,7 +107,7 @@ final class ChatViewModel: ObservableObject {
                 for try await snapshot in stream {
                     streamingPlan = snapshot.content
                 }
-                finalPlan = streamingPlan?.asComplete()
+                finalPlan = streamingPlan?.asComplete()?.normalized()
                 
                 if let plan = finalPlan {
                     // Approval bubble derived from the structured plan (no drift)
@@ -179,7 +179,7 @@ final class ChatViewModel: ObservableObject {
                     messages.append(.init(role: .assistant, text: "No problem—recipe canceled. Tell me when you want to try again."))
                     
                 case .unclear:
-                    messages.append(.init(role: .assistant, text: "I didn’t catch that—say **Yes** to accept, or tell me what to change (e.g., “stronger”, “ratio 1:16”, “iced 300ml”)."))
+                    messages.append(.init(role: .assistant, text: "I didn’t catch that—say **Yes** to accept, or tell me what to change (e.g., “stronger”, “sweeter”, “iced 300ml”)."))
                 }
             } catch {
                 errorText = error.localizedDescription
@@ -201,15 +201,19 @@ final class ChatViewModel: ObservableObject {
     // Small, human-friendly summary that the AI "says" when asking for approval
     private func approvalPrompt(for plan: BrewPlan) -> String {
         let dose = String(format: "%.1f", plan.coffeeGrams)
+        let volume = Int(plan.primaryVolume)
         let ratio = String(format: "%.1f", plan.ratio)
+        let totalPours = plan.totalPours
         let interval = plan.pourIntervalSec
+        let totalTime = formatTime(plan.totalTime)
+        let waterTemp = plan.waterTemp
         switch plan.style {
         case .iced:
-            let target = Int(plan.primaryVolume.rounded())
-            return "Here’s my 4:6 (Japanese iced) suggestion: **\(dose)g**, target **\(target)ml**, ratio **1:\(ratio)**, interval **\(interval)s**. Does this look good? Say **Yes** to confirm or tell me what to change."
+            let iceAmount = plan.iceAmount
+            let water = volume - iceAmount
+            return "Here’s my 4:6 (Japanese iced) suggestion: prepare **\(dose)g** of ground coffee, **\(iceAmount)g** of ice, and **\(water)ml** of water **@\(waterTemp)°C**. The final result wil be **\(volume)ml** of coffee with **1:\(ratio)** ratio, **\(interval)s** interbal, and **\(totalTime)** total time. Does this look good? Say **Yes** to confirm or tell me what to change."
         case .hot:
-            let total = Int(plan.primaryVolume.rounded())
-            return "Here’s my 4:6 suggestion: **\(dose)g**, total **\(total)ml**, ratio **1:\(ratio)**, interval **\(interval)s**. Happy with this? Say **Yes** to confirm or tell me what to tweak."
+            return "Here’s my 4:6 suggestion: prepare **\(dose)g** of ground coffee, **\(volume)ml** of water **@\(waterTemp)°C** with **1:\(ratio)** ratio, **\(totalPours)** total pours, **\(interval)s** interval, and **\(totalTime)** total time. Happy with this? Say **Yes** to confirm or tell me what to tweak."
         }
     }
     
@@ -225,5 +229,12 @@ final class ChatViewModel: ObservableObject {
     
     private func hidePlanCard() {
         confirmedPlan = nil
+    }
+    
+    // Format the elapsed time into mm:ss
+    private func formatTime(_ time: TimeInterval) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

@@ -9,15 +9,11 @@ import SwiftUI
 
 struct HomeSimpleView: View {
     
-    @Binding var selectedBalanceSegment: Int
-    @Binding var selectedStrengthSegment: Int
-    @Binding var selectedRoastSegment: Int
+    @Binding var selectedBalanceSegment: BrewBalance
+    @Binding var selectedStrengthSegment: BrewStrength
+    @Binding var selectedRoastSegment: BrewRoast
     @Binding var totalPours: Int
     @Binding var waterTemp: Int
-    
-    let balanceSegments = ["Sweeter", "Standard", "Brighter"]
-    let strengthSegments = ["Light", "Medium", "Strong"]
-    let roastSegments = ["Light Roast", "Medium Roast", "Dark Roast"]
     
     var body: some View {
         // MARK: Balance
@@ -28,9 +24,9 @@ struct HomeSimpleView: View {
             Spacer()
             
             Picker("Select a segment", selection: $selectedBalanceSegment) {
-                ForEach(0..<balanceSegments.count, id: \.self) { index in
-                    Text(balanceSegments[index])
-                        .tag(index)
+                ForEach(BrewBalance.allCases, id: \.self) { balance in
+                    Text(balance.rawValue)
+                        .tag(balance)
                 }
             }
             .pickerStyle(.automatic)
@@ -48,9 +44,9 @@ struct HomeSimpleView: View {
             Spacer()
             
             Picker("Select a segment", selection: $selectedStrengthSegment) {
-                ForEach(0..<strengthSegments.count, id: \.self) { index in
-                    Text(strengthSegments[index])
-                        .tag(index)
+                ForEach(BrewStrength.allCases, id: \.self) { strength in
+                    Text(strength.rawValue)
+                        .tag(strength)
                 }
             }
             .pickerStyle(.automatic)
@@ -60,7 +56,7 @@ struct HomeSimpleView: View {
         .background(Color(.systemGray6))
         .cornerRadius(16)
         .onChange(of: selectedStrengthSegment, { _, _ in
-            totalPours = selectedStrengthSegment == 0 ? 4 : selectedStrengthSegment == 1 ? 5 : selectedStrengthSegment == 2 ? 6 : 5
+            totalPours = selectedStrengthSegment == .light ? 4 : selectedStrengthSegment == .medium ? 5 : selectedStrengthSegment == .strong ? 6 : 5
         })
         
         // MARK: Roast
@@ -71,9 +67,9 @@ struct HomeSimpleView: View {
             Spacer()
             
             Picker("Select a segment", selection: $selectedRoastSegment) {
-                ForEach(0..<roastSegments.count, id: \.self) { index in
-                    Text(roastSegments[index])
-                        .tag(index)
+                ForEach(BrewRoast.allCases, id: \.self) { roast in
+                    Text(roast.rawValue)
+                        .tag(roast)
                 }
             }
             .pickerStyle(.automatic)
@@ -83,15 +79,15 @@ struct HomeSimpleView: View {
         .background(Color(.systemGray6))
         .cornerRadius(16)
         .onChange(of: selectedRoastSegment, { _, _ in
-            waterTemp = selectedRoastSegment == 0 ? 93 : selectedRoastSegment == 1 ? 88 : selectedRoastSegment == 2 ? 83 : 88
+            waterTemp = selectedRoastSegment == .lightRoast ? 93 : selectedRoastSegment == .mediumRoast ? 88 : selectedRoastSegment == .darkRoast ? 83 : 88
         })
     }
 }
 
 #Preview {
-    HomeSimpleView(selectedBalanceSegment: .constant(1),
-                   selectedStrengthSegment: .constant(1),
-                   selectedRoastSegment: .constant(1),
+    HomeSimpleView(selectedBalanceSegment: .constant(.standard),
+                   selectedStrengthSegment: .constant(.medium),
+                   selectedRoastSegment: .constant(.mediumRoast),
                    totalPours: .constant(5),
                    waterTemp: .constant(88))
 }

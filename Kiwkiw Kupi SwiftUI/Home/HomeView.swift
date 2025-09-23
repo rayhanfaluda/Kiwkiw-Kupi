@@ -14,9 +14,9 @@ struct HomeView: View {
     
     @State var coffeeAmount: Double = 200
     @State var selectedCoffeeRatio: Double = 15
-    @State var selectedBalanceSegment = 1
-    @State var selectedStrengthSegment = 1
-    @State var selectedRoastSegment = 1
+    @State var selectedBalanceSegment: BrewBalance = .standard
+    @State var selectedStrengthSegment: BrewStrength = .medium
+    @State var selectedRoastSegment: BrewRoast = .mediumRoast
     @State var selectedPourInterval = 45
     @State var totalPours = 5
     @State var waterTemp = 88
@@ -53,10 +53,10 @@ struct HomeView: View {
                 .padding(.bottom)
                 .onChange(of: brewingMode, { _, _ in
                     if brewingMode == .iced {
-                        selectedBalanceSegment = 0
+                        selectedBalanceSegment = .sweeter
                         totalPours = 3
                     } else {
-                        selectedBalanceSegment = 1
+                        selectedBalanceSegment = .standard
                         totalPours = 5
                     }
                 })
